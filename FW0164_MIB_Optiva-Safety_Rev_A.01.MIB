@@ -1,0 +1,169 @@
+Emcore-Optiva-Safety DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        TimeTicks
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        optivaNMS, emcore
+                FROM Emcore-SMI;
+
+emcoreOptivaSafety MODULE-IDENTITY
+        LAST-UPDATED "201005100000Z"
+        ORGANIZATION "Emcore Corp"
+        CONTACT-INFO
+          "Emcore Corp.
+           www.emcore.com
+           Postal: 2015 Chestnut St.
+                   Alhambra, CA 91803
+                   USA
+           Tel: +1 (626) 293-3400"
+        DESCRIPTION  "This MIB defines the SNMP interface to monitor and
+                      control the laser safety feature that is configured
+                      on some Emcore Optiva systems."
+        REVISION   "A.02"
+        DESCRIPTION 
+          "SNMP version 1"
+        ::= { optivaNMS 50 }
+
+------------------------------------------
+-- File Number: FW-TBD
+-- File Description: Emcore-Optiva-Safety MIB
+-- File Revision Letter: A-draft 
+------------------------------------------
+
+
+safetyObjects OBJECT IDENTIFIER ::= { emcoreOptivaSafety 1 }  
+
+addIP OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (16))
+        MAX-ACCESS write-only
+        STATUS     current
+        DESCRIPTION "Add ip addresses to the list"
+        ::= { safetyObjects 1 }
+
+removeIP OBJECT-TYPE
+        SYNTAX      INTEGER (0..255)
+        MAX-ACCESS write-only
+        STATUS     current
+        DESCRIPTION "Remove an ip address from the list
+			0 = remove all ip in the list
+			others = remove a specific item number"
+        ::= { safetyObjects 2 }      
+        
+showIPList 	OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Show all ip addresses from the list"
+        ::= { safetyObjects 3 }
+
+cardSaftStat OBJECT-TYPE
+        SYNTAX     INTEGER { na(0),
+        					 rxOK(1),
+        					 rxOFF(2),
+        					 lsrON(3),
+        					 lsrOFF(4)
+        					} 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Card Safety Status. 
+                     The last 2 digits of the name are the card number.
+             0 = NA.     Card slot not used for Laser Safety feature.
+             1 = RxOK    Card is a Rx used to monitor fiber connection.
+                         Normal optical input.
+             2 = RxOFF   Card is a Rx used to monitor fiber connection.
+                         Input is OFF.   
+             3 = LsrON   Card contains laser that turns off if fiber 
+                         disconnects.  Present monitoring indicates that
+                         this laser should be ON.
+             4 = LsrOFF  Card contains laser that turns off if fiber 
+                         disconnects.  Present monitoring indicates that
+                         this laser should be OFF."
+        ::= { safetyObjects 4 }
+
+chassisSafetyStatus OBJECT-TYPE
+        SYNTAX     INTEGER { na(0),
+        					 masterOK(1),
+        					 masterOFF(2),
+        					 followerON(3),
+        					 followerOFF(4)
+        				   }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION  "Summary Safety Status of the Complete Chassis
+           0 = NA.          Chassis not configured for laser safety feature.
+           1 = MasterOK     Master safety chassis type. All its Rx are OK.
+           2 = MasterOFF 	Master safety chassis type. 
+                            Cables disconnected or OFF.
+           3 = FollowerON   Follower safety chassis type.  
+                            Present input from Master chassis indicates that
+                            all lasers should be ON.
+           4 = FollowerOFF  Follower safety chassis type.  
+                            Present input from Master chassis indicates that
+                            all lasers should be OFF."
+        ::= { safetyObjects 5 }
+
+
+--------------------------------------------------------------------------
+-- BEGIN Chassis Configuration.  
+-- The following objects are constant during operation
+--------------------------------------------------------------------------
+
+chassisSafetyType OBJECT-TYPE
+        SYNTAX     INTEGER { na(0),
+        					 master(1),
+        					 follower(2)
+        				    }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION  "
+             0 = NA.         Chassis not configured for laser safety shut-off.
+             1 = Master      Chassis has Rx configured for safety.
+                             Chassis may or may not have Laser.
+             2 = Follower    Chassis has at least one laser that should be
+                             shut off when fiber disconnects.  
+                             Chassis has no Rx configured for safety."
+        ::= { safetyObjects 6 }
+
+chassisConfigName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (40))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION  "This variable contains an optional text description to
+                      clarify the type of configuration for this chassis.
+                      The text may be inserted at time of manufacture or
+                      changed later by the user. 
+                      The text does not update the rest of the configuration.
+                      Similarly, changing the safety configuration does not 
+                      automatically update this text."
+        ::= { safetyObjects 7 }
+
+---------------------------------------------------------------------
+-- BEGIN Individual Card Configuration
+-- The following are constant during operation
+---------------------------------------------------------------------
+
+cardSafetyType OBJECT-TYPE
+        SYNTAX     INTEGER { na(0),
+        					 rx1(1),
+        					 rx2(2),
+        					 lsr(3)
+        				   }	 
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "These variables are used to indicate how the cards are
+                     monitored and controlled for Laser Safety. 
+                     The last 2 digits of the name are the card number.
+           0 = NA   Card slot not used for Laser Safety.
+           1 = Rx1  Card is a Rx used to monitor fiber cable 1.
+           2 = Rx2  Card is a Rx used to monitor fiber cable 2.
+           3 = Lsr  Card contains laser that should turn off 
+                    if fiber disconnects in order to be eye-safe."
+        ::= { safetyObjects 8 }
+
+END
+--   

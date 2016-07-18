@@ -1,0 +1,342 @@
+Emcore-Optiva-Multi-Signals-TX DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        TimeTicks
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        optivaNMS, emcore
+                FROM Emcore-SMI;
+
+emcore-optiva-multi-signals-TX MODULE-IDENTITY
+        LAST-UPDATED "201208270000Z"
+        ORGANIZATION "Emcore Corp"
+        CONTACT-INFO
+         "Emcore Broadband Division
+          www.emcore.com
+
+          Postal: 2015 Chestnut St.
+                  Alhambra, CA 91803
+                  USA
+
+          Tel: +1 (626) 293-3400"
+        DESCRIPTION
+                "Emcore-Optiva System"
+        REVISION	"201208270000Z"
+        DESCRIPTION 
+          "OptivaView NMS"
+        ::= { optivaNMS 1 }
+
+------------------------------------------
+-- File Number: MIB-0001
+-- File Description: MIB, Optiva L Tx
+-- File Version: A.01
+------------------------------------------
+
+emcoreOptivaNCTable OBJECT-TYPE     
+ 		SYNTAX SEQUENCE OF EmcoreOptivaRsuEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+          "OptivaView NMS"
+        ::= { optivaNMS 108 }
+
+laserBiasCurrent OBJECT-TYPE
+        SYNTAX     INTEGER (0..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Laser DC bias current.
+                Units = mA"
+        ::= { optivaLTxObjects 1 }
+
+
+opticalPower OBJECT-TYPE
+        SYNTAX     INTEGER (-9999..9999)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Optical Power at the output optical connector.  
+                This reading is calculated from the DC electrical
+                current from the monitor photodiode internal to the laser package
+                Units = 0.01 dBm optical, 1000 = 10.00 dBm"
+       ::= { optivaLTxObjects 2 }
+
+
+moduleTemp OBJECT-TYPE
+        SYNTAX     INTEGER (-4500..12500)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Temperature of the insert card
+                Units = 0.01 degree Celsius, 2500 = 25 degree Celsius"
+        ::= { optivaLTxObjects 3 }
+
+
+relativeRFAtten OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (4))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                 "Command to increase or decrease RF Gain:
+                 1= increases aprox.  1 dB
+                 0= decreases approx. 1 dB 
+                 Read Output:
+                 0 corresponds to maximum RF gain.  
+                 -30 corresponds to approx. 30 dB less than max gain. 
+                 Software value may be greater than hardware limit
+				 Valid Range = -30 to 0"
+        ::= { optivaLTxObjects 4 }
+
+rfPowerAtLaser OBJECT-TYPE
+        SYNTAX     INTEGER (-9999..9999)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "RF Power from the last RF amp into the laser.
+                 Units = 0.01 dBm, -1000 =  -10 dBm"
+        ::= { optivaLTxObjects 5}
+        
+
+lnbVoltage OBJECT-TYPE
+        SYNTAX     INTEGER (0..20000)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "DC voltage on the center pin of the RF connector.
+                Units = 0.001 Volts, 17000 = 17 Volts"
+        ::= { optivaLTxObjects 6}
+
+
+modeSGC-MGC OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "1 = MGC = Manual Gain Control
+                 0 = SGC = Smart Gain Control"
+        ::= { optivaLTxObjects 7}
+
+
+summaryAlarm OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "1 = Alarm
+                 0 = No Alarm"
+        ::= { optivaLTxObjects 8}
+
+psAlarm OBJECT-TYPE
+        SYNTAX     INTEGER (0..12)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Power Supply Alarm. Status of highest Voltage PS.
+                 0 = No alarm (status OK)
+                 1 or 3 = Major High, indicates significantly high
+                 2 = Hi (Disabled)     
+                 8 = Lo (Disabled)
+                 4 or 12 = Major Low, indicates significantly low"
+        ::= { optivaLTxObjects 9}
+
+
+rfLevelAlarm OBJECT-TYPE
+        SYNTAX     INTEGER (0..12)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Alarm for RF level into the laser.
+                 0 = No alarm (status OK)
+                 1 or 3 = Major High, indicates significantly high
+                         (Refer to object 25)
+                 2 = Hi  (Refer to object 24)
+                 8 = Lo  (Refer to object 23)
+                 4 or 12 = Major Low, indicates significantly low
+                         (Refer to object 22)"
+        ::= { optivaLTxObjects 10}
+
+
+opticalPowerAlarm OBJECT-TYPE
+        SYNTAX     INTEGER (0..12)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Alarm for Laser Optical Power.
+                 0 = No alarm (status OK)
+                 1 or 3 = Major High, indicates significantly high
+                 2 = Hi (Disabled)
+                 8 = Lo (Disabled)
+                 4 or 12 = Major Low, indicates significantly low
+                 These value are factory set and vary based on  
+                 transmitter optical output specification"
+        ::= { optivaLTxObjects 11}
+
+
+modelNumber OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (40))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Model Number"
+        ::= { optivaLTxObjects 12}
+
+
+serialNumber OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (8))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Serial Number"
+        ::= { optivaLTxObjects 13}
+
+
+manufacturingDate OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (8))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Manufacturing Date"
+        ::= { optivaLTxObjects 14}
+
+
+firmwareRev OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (4))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Firmware Revision"
+        ::= { optivaLTxObjects 15}
+
+hardwareRev OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (4))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Hardware Revision"
+        ::= { optivaLTxObjects 16}
+
+
+adjustRelativeRFGainControl OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS write-only
+        STATUS     current
+        DESCRIPTION  "Command to increase or decrease RF Gain
+                 1= increases approx. 1 dB
+                 0= decreases approx. 1 dB"
+        ::= { optivaLTxObjects 17}
+
+peak OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS write-only
+        STATUS     current
+        DESCRIPTION "Command that changes RF gain so that RF Power at Laser
+                 is approx. at value for Peak (optimum) performance.
+                 1 = activate this function (other = do nothing)"
+        ::= { optivaLTxObjects 18}
+
+
+rfPwrAtLsrSGCLo OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Window for RF Power at Laser at low end of SGC range.
+                 Units = 0.1 dBm, 30 = 3dBm
+	         Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve.   
+                 Deviation from factory setting is not advised"
+     	::= { optivaLTxObjects 19}
+
+
+rfPwrAtLsrPeakTarget OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser corresponding to the approximate
+                 power for Peak (Optimal) RF performance of the link.
+                 Units = 0.1 dBm, 50 = 5dBm
+	         Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve.   
+                 Deviation from factory setting is not advised"
+        ::= { optivaLTxObjects 20}
+       
+
+rfPwrAtLsrSGCHi OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION 
+        	"Window for RF Power at Laser at high end of SGC range.
+                 Units = 0.1 dBm, 30 = 3dBm
+	         Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve.  See manual or spec for physical limits
+                 Deviation from factory setting is not advised"
+         ::= { optivaLTxObjects 21}
+
+
+rfPwrAtLsrRFalarmMajLo OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser that triggers Major Low Alarm.
+                 Units = 0.1 dBm, -200 = -20dBm
+                 Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 Deviation from factory setting is not advised"
+        ::= { optivaLTxObjects 22}
+
+rfPwrAtLsrRFalarmMnrLo OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser that triggers Minor Low Alarm.
+                 Units = 0.1 dBm, -100 =  -10 dBm
+                 Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve. 
+                 Deviation from factory setting is not advised"
+        ::= { optivaLTxObjects 23}
+
+
+rfPwrAtLsrRFalarmMnrHigh OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "RF Power at Laser that triggers Minor High Alarm.
+                 Units = 0.1 dBm, 60 =  6 dBm
+                 Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 Deviation from factory setting is not advised"
+        ::= { optivaLTxObjects 24}
+
+
+rfPwrAtLsrRFalarmMajHigh OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "RF Power at Laser that triggers Major High Alarm.
+                 Units = 0.1 dBm, 100 =  10 dBm
+                 Valid Range = -700 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 Deviation from factory setting is not advised"
+        ::= { optivaLTxObjects 25}
+
+
+END
+
+
+
+
+
+
+
+
+
+
