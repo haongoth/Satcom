@@ -1,0 +1,439 @@
+Emcore-Optiva-Dual-Tx DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        TimeTicks
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        TRAP-TYPE
+		FROM RFC-1215
+        optivaNMS, emcore
+                FROM Emcore-SMI;
+
+optivaNMS MODULE-IDENTITY
+        LAST-UPDATED "201302250000Z"
+        ORGANIZATION "Emcore Corp"
+        CONTACT-INFO
+          "www.emcore.com
+           Postal: 2015 Chestnut St.
+                   Alhambra, CA 91803
+                   USA
+           Tel: +1 (626) 293-3400"
+        DESCRIPTION  "This MIB defines the SNMP interface to monitor and control the 
+               features of the LBand Dual Tx for Emcore Optiva systems."
+        REVISION   "A_01 11/25/2015"
+        DESCRIPTION 
+          "SNMP version 1"
+        ::= { emcoreMgmt 1 }
+
+emcoreOptivaDualTxTable OBJECT-TYPE     
+ 		SYNTAX SEQUENCE OF EmcoreOptivaDualTxEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+          "EmcoreView NMS"
+        ::= { optivaNMS 6 }
+
+emcoreOptivaDualTxEntry OBJECT-TYPE  
+		SYNTAX  EmcoreOptivaDualTxEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+        	"A list of osu module general status entries."
+	 	INDEX {readSlotIndex }
+	 	::= { emcoreOptivaDualTxTable 1 }
+
+EmcoreOptivaDualTxEntry ::= SEQUENCE {
+        laserBiasCurrent
+            INTEGER,
+        opticalPower
+            INTEGER,
+        moduleTemp
+            INTEGER,
+        relativeRFAtten
+            INTEGER,
+        rfPowerAtLaser
+            INTEGER,
+        lnbVoltage
+            INTEGER,
+        modeSGC-MGC
+            INTEGER,
+        summaryAlarm
+            INTEGER,
+        psAlarm
+            INTEGER,
+        rfLevelAlarm
+            INTEGER,
+        opticalPowerAlarm
+            INTEGER,
+        modelNumber
+            DisplayString,
+        serialNumber
+            DisplayString,
+        manufacturingDate
+            DisplayString,
+        firmwareRev
+            DisplayString,
+        hardwareRev
+            DisplayString,
+		adjustRelativeRFGainControl
+		    INTEGER,	
+		peak
+		    INTEGER,
+		rfPwrAtLsrSGCLo
+	        DisplayString,
+		rfPwrAtLsrPeakTarget
+	        DisplayString,
+		rfPwrAtLsrSGCHi
+		    DisplayString,
+		rfPwrAtLsrRFalarmMajLo
+	        DisplayString,
+		rfPwrAtLsrRFalarmMnrLo
+	        DisplayString,
+		rfPwrAtLsrRFalarmMnrHigh
+		    DisplayString,
+		rfPwrAtLsrRFalarmMajHigh
+		    DisplayString,
+	}
+
+
+laserBiasCurrent OBJECT-TYPE
+        SYNTAX     INTEGER (0..255)        					
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION         
+                "Laser DC bias current.
+                Units = mA"
+        ::= { emcoreOptivaDualTxEntry 1 }
+
+
+opticalPower OBJECT-TYPE
+        SYNTAX     INTEGER (-9999..9999)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                "Optical Power at the output optical connector.  
+                This reading is calculated from the DC electrical
+                current from the monitor photodiode internal to the laser package
+                Units = 0.01 dBm optical"
+        ::= { emcoreOptivaDualTxEntry  2}
+        
+moduleTemp OBJECT-TYPE
+        SYNTAX     INTEGER (-450..1250)
+        MAX-ACCESS read-only
+        STATUS     obsolete
+        DESCRIPTION
+                "Temperature of the insert card
+                Units = 0.01 degree Celsius"
+        ::= { emcoreOptivaDualTxEntry 3}
+
+relativeRFAtten OBJECT-TYPE
+        SYNTAX     INTEGER (0..3175)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                 
+        		"Relative RF attenuation in the Tx pre-amplifier.  
+                 0 corresponds to maximum RF gain.  
+                 3175 corresponds to approx. 31.75 dB less than max gain.
+                 Software value may be greater than hardware limit
+                 In MGC mode RF gain can be changed by user.
+                 In SGC mode RF gain changes automatically.
+                 Units = 0.01 dB
+                 "
+        ::= { emcoreOptivaDualTxEntry 4 }
+
+rfPowerAtLaser OBJECT-TYPE
+        SYNTAX     INTEGER (-9999..9999)        
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                "RF Power from the last RF amp into the laser.
+                 0 = 0 dBm  
+                 -1000 =  -10 dBm
+                 Units = 0.01 dBm
+                 "
+        ::= { emcoreOptivaDualTxEntry 5 }
+
+lnbVoltage OBJECT-TYPE
+        SYNTAX     INTEGER (0..20000)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION 
+                "DC voltage on the center pin of the RF connector.
+                Units = 0.001 Volts"
+        ::= { emcoreOptivaDualTxEntry 6 }
+
+modeSGC-MGC OBJECT-TYPE
+        SYNTAX     INTEGER {      
+        					sGC (0),
+        					mGC (1),
+        					other (2)
+        				   }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "1 = MGC = Manual Gain Control
+                 0 = SGC = Smart Gain Control"
+        ::= { emcoreOptivaDualTxEntry 7}
+
+
+summaryAlarm OBJECT-TYPE
+        SYNTAX     INTEGER {
+        					oK (0),
+        					alarm (1)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "1 = Alarm
+                 0 = No Alarm"
+        ::= { emcoreOptivaDualTxEntry 8}
+
+psAlarm OBJECT-TYPE
+        SYNTAX     INTEGER {
+        					oK (0),
+        					majorHi (1),
+        					warningHi (2),
+        					warningLo (4),
+        					majorLo (8)
+        					}
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Power Supply Alarm. Status of highest Voltage PS.
+                 0 = No alarm (status OK)
+                 1 = Major High, indicates significantly high
+                        (Factory set at +13v)
+                 2 = Hi (Disabled)     
+                 4 = Lo (Disabled)
+                 8 = Major Low, indicates significantly low
+                        (Factory set at +10v)"
+        ::= { emcoreOptivaDualTxEntry 9}
+
+
+rfLevelAlarm OBJECT-TYPE
+        SYNTAX     INTEGER {
+        					oK (0),
+        					majorHi (1),
+        					warningHi (2),
+        					warningLo (4),
+        					majorLo (8)
+        					}
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Alarm for RF level into the laser.
+                 0 = No alarm (status OK)
+                 1 = Major High, indicates significantly high
+                         (Refer to object 25)
+                 2 = Hi  (Refer to object 24)
+                 4 = Lo  (Refer to object 23)
+                 8 = Major Low, indicates significantly low
+                         (Refer to object 22)"
+        ::= { emcoreOptivaDualTxEntry 10}
+
+
+opticalPowerAlarm OBJECT-TYPE
+        SYNTAX     INTEGER {
+        					oK (0),
+        					majorHi (1),
+        					warningHi (2),
+        					warningLo (4),
+        					majorLo (8)
+        					}
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Alarm for Laser Optical Power.
+                 0 = No alarm (status OK)
+                 1 = Major High, indicates significantly high
+                 2 = Hi
+                 4 = Lo
+                 8 = Major Low, indicates significantly low
+                 These value are factory set and vary based on  
+                 transmitter optical output specification"
+        ::= { emcoreOptivaDualTxEntry 11}
+
+modelNumber OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (40))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Model Number"
+        ::= { emcoreOptivaDualTxEntry 12}
+
+
+serialNumber OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (8))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Serial Number"
+        ::= { emcoreOptivaDualTxEntry 13}
+
+
+manufacturingDate OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (8))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Manufacturing Date"
+        ::= { emcoreOptivaDualTxEntry 14}
+
+
+firmwareRev OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (4))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Firmware Revision"
+        ::= { emcoreOptivaDualTxEntry 15}
+
+hardwareRev OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (4))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Hardware Revision"
+        ::= { emcoreOptivaDualTxEntry 16}
+
+adjustRelativeRFGainControl OBJECT-TYPE
+        SYNTAX     INTEGER (0..3175)
+        MAX-ACCESS write-only
+        STATUS     current
+        DESCRIPTION  "Command to increase or decrease RF Gain
+        		      0 corresponds to maximum RF gain.  
+                 	  3175 corresponds to approx. 31.75 dB less than max gain.
+                      Units = 0.01 dB"
+        ::= { emcoreOptivaDualTxEntry 17}
+
+peak OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS write-only
+        STATUS     current
+        DESCRIPTION "Command that changes RF gain so that RF Power at Laser
+                 is approx. at value for Peak (optimum) performance.
+                 1 = activate this function (other = do nothing)"
+        ::= { emcoreOptivaDualTxEntry 18}
+
+
+rfPwrAtLsrSGCLo OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "RF Power at Laser at low end of SGC range.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+	         Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 This value has been factory set at -4dBm
+                 Deviation from factory setting is not advised"
+     	::= { emcoreOptivaDualTxEntry 19}
+
+
+rfPwrAtLsrPeakTarget OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser corresponding to the approximate
+                 power for Peak (Optimal) RF performance of the link.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+	         Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve.   
+                 This value has been factory set at 2dBm
+                 Deviation from factory setting is not advised"
+        ::= { emcoreOptivaDualTxEntry 20}
+       
+
+rfPwrAtLsrSGCHi OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser at high end of SGC range.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+	         Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve.  See manual or spec for physical limits
+                 This value has been factory set at 4dBm
+                 Deviation from factory setting is not advised"
+         ::= { emcoreOptivaDualTxEntry 21}
+
+
+rfPwrAtLsrRFalarmMajLo OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser that triggers Major Low Alarm.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+                 Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 This value has been factory set at -20dBm
+                 Deviation from factory setting is not advised"
+        ::= { emcoreOptivaDualTxEntry 22}
+
+rfPwrAtLsrRFalarmMnrLo OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION "RF Power at Laser that triggers Minor Low Alarm.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+                 Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve. 
+                 This value has been factory set at -6dBm
+                 Deviation from factory setting is not advised"
+        ::= { emcoreOptivaDualTxEntry 23}
+
+
+rfPwrAtLsrRFalarmMnrHigh OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "RF Power at Laser that triggers Minor High Alarm.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+                 Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 This value has been factory set at +6dBm
+                 Deviation from factory setting is not advised"
+        ::= { emcoreOptivaDualTxEntry 24}
+
+
+rfPwrAtLsrRFalarmMajHigh OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "RF Power at Laser that triggers Major High Alarm.
+                 0 = 0 dBm  
+                 -100 =  -10 dBm
+                 Units = 0.1 dBm
+                 Valid Range = -200 to 300
+                 This software range is wider than hardware can
+                 achieve.
+                 This value has been factory set at +10dBm
+                 Deviation from factory setting is not advised"
+        ::= { emcoreOptivaDualTxEntry 25}
+
+
+END
+
+

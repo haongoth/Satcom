@@ -1,0 +1,238 @@
+Emcore-Optiva-EDFA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    optivaNMS
+        FROM Emcore-SMI;
+
+emcore-optiva-EDFA MODULE-IDENTITY
+    LAST-UPDATED      "201004140000Z"
+    ORGANIZATION      "Emcore Corp"
+    CONTACT-INFO      "Emcore Broadband Division
+                       www.emcore.com
+
+                       Postal: 2015 Chestnut St.
+                       Alhambra, CA 91803
+                       USA
+
+                       Tel: +1 (626) 293-3400
+                      "
+    DESCRIPTION       "MIB to define SNMP access to the Emcore Optiva EDFA module."
+    REVISION          "201300000000Z"
+    DESCRIPTION       "Initial version"
+    ::= { optivaNMS 55}
+
+------------------------------------------
+-- File Number: SID-####
+-- File Description: MIB, Optiva EDFA
+-- File Revision Letter: A
+------------------------------------------
+
+optivaEDFAObjects OBJECT IDENTIFIER ::= { emcore-optiva-EDFA 1}
+
+-----------------------------------------------------------------------
+-- BEGIN definitions which are 1 to 1 relationship with unit
+-----------------------------------------------------------------------
+moduleType                OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Type of EDFA module."
+    ::= { optivaEDFAObjects 1 }
+
+modelNumber               OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Assigned model number of module."
+    ::= { optivaEDFAObjects 2 }
+
+serialNumber              OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Assigned serial number of module."
+    ::= { optivaEDFAObjects 3 }
+
+firmwareVersion           OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Current installed firmware version."
+    ::= { optivaEDFAObjects 4 }
+
+hardwareVersion           OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Current installed hardware version."
+    ::= { optivaEDFAObjects 5 }
+
+mfgDate                   OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Manufacturing date."
+    ::= { optivaEDFAObjects 6 }
+
+summaryAlarmStatus        OBJECT-TYPE
+    SYNTAX                BITS 
+                          {
+                           systemTemp(0),
+                           laserTemp(1),
+                           laserCurrent(2),
+			   plus3V3(3),
+                           photoOut(4),
+                           photoInP(5),
+			   photoLIM(6)
+                          }
+    UNITS                 "no units"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Returns a bit mapped status word where each bit set (as defined below) 
+                           indicates a specific active alarm:
+
+                               0       1       2       3       4       5       6       7    
+                           +-------+-------+-------+-------+-------+-------+-------+-------+
+                           |System | Laser | Laser | Plus  | Photo | Photo | Photo |
+                           | Temp  | Temp  |Current| 3v3   | out   | Input | LIM   |
+                           |       |       |       |       |       |       |       | 
+                           |       |       |       |       |       |       |       |       |
+                           +-------+-------+-------+-------+-------+-------+-------+-------+
+                          "
+    ::= { optivaEDFAObjects 7 }
+   
+plus3V3PowerSupplyStatus  OBJECT-TYPE
+    SYNTAX                Integer32(0..160)
+    UNITS                 "tenth of a volt(V)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured voltage of the 3.3V supply."
+    ::= { optivaEDFAObjects 8 }
+
+unitInternalTemperature   OBJECT-TYPE
+    SYNTAX                Integer32(-500..1200)
+    UNITS                 "tenth of a Celsius degree(C)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured temperature of printed circuit board assembly."
+    ::= { optivaEDFAObjects 9 }
+
+keyswitchPosition         OBJECT-TYPE
+    SYNTAX                INTEGER { undefined(0),off(1),on(2) }
+    UNITS                 "no units"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Physical position of the front panel keyswitch." 
+    ::= { optivaEDFAObjects 11}
+
+opticalInputPower       OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of decibel relative to one milliwatt(dBm)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured optical power at receiver input."
+    ::= { optivaEDFAObjects 12}
+
+edfaPumpLaserPhotoCurrent OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of a milliampere(mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured back facet photodetector current of EDFA pump laser."
+    ::= { optivaEDFAObjects 19}
+
+edfaPumpLaserCurrent      OBJECT-TYPE
+    SYNTAX                Integer32(0..1250)
+    UNITS                 "milliampere(mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured DC current of EDFA pump laser."
+    ::= { optivaEDFAObjects 20}
+
+edfaPumpLaserTemperature  OBJECT-TYPE
+    SYNTAX                Integer32(-500..1200)
+    UNITS                 "tenth of a Celsius degree(C)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured temperature of EDFA pump laser."
+    ::= { optivaEDFAObjects 21}
+
+edfaOpticalOutputPower    OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of decibel relative to one milliwatt(dBm)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured optical power at EDFA output."
+    ::= { optivaEDFAObjects 22}
+
+--//// NEW OBJECTS //////
+     
+edfaTecCurrent    OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of a milliAmp (mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured Laser Tec Currnet."
+    ::= { optivaEDFAObjects 23}
+
+
+laserMode    OBJECT-TYPE
+       SYNTAX             Integer32
+       {
+         off(0),
+         const_cur(1),
+         const_pwr(2),
+         const_gain(3)
+       }
+   MAX-ACCESS            read-write
+   STATUS                current
+   DESCRIPTION           "This value is the operation mode of the unit: OFF, CONST CUR, CONST PWR, CONST GAIN."
+   ::= { optivaEDFAObjects 24}
+   
+laserCurSetPoint    OBJECT-TYPE
+      SYNTAX             Integer32(1..1400)
+   	  UNITS				 "mA"
+      MAX-ACCESS         read-write
+      STATUS             current
+      DESCRIPTION        "This value is the laser current setpoint. The value is a float. This value is multiplied by 1000 within the agent."
+     ::= { optivaEDFAObjects 25}
+    
+laserPwrSetPoint    OBJECT-TYPE
+     SYNTAX             Integer32(0..25)
+  	  UNITS				 "dBm"
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION        "This value is the laser power setpoint. The value is a float. This value is multiplied by 1000 within the agent."
+     ::= { optivaEDFAObjects 26}
+    
+laserTempSetPoint    OBJECT-TYPE
+     SYNTAX             Integer32(15..40)
+  	  UNITS				 "C"
+     MAX-ACCESS         read-write
+     STATUS             current
+     DESCRIPTION        "This value is the laser Temperature setpoint. The value is a float. This value is multiplied by 1000 within the agent."
+     ::= { optivaEDFAObjects 27}
+    
+-----------------------------------------------------------------------
+-- END definitions which are 1 to 1 relationship with unit
+-----------------------------------------------------------------------
+
+END
+--  End of EDFA MIB definitions      
+
+
+
+
+
+
+
+
+
+
+

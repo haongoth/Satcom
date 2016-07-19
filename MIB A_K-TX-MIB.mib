@@ -1,0 +1,317 @@
+Emcore-Optiva-Kband-TX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    optivaNMS, emcore
+        FROM Emcore-SMI;
+
+emcore-optiva-Kband-TX MODULE-IDENTITY
+    LAST-UPDATED      "201004140000Z"
+    ORGANIZATION      "Emcore Corp"
+    CONTACT-INFO      "Emcore Broadband Division
+                       www.emcore.com
+
+                       Postal: 2015 Chestnut St.
+                       Alhambra, CA 91803
+                       USA
+
+                       Tel: +1 (626) 293-3400
+                      "
+    DESCRIPTION       "MIB to define SNMP access to the Emcore Optiva K-band transmitter module."
+    REVISION          "201208140000Z"
+    DESCRIPTION       "Initial version"
+    ::= { optivaNMS 53}
+
+------------------------------------------
+-- File Number: SID-####
+-- File Description: MIB, Optiva K-band Tx
+-- File Revision Letter: A
+------------------------------------------
+
+optivaKbandTxObjects OBJECT IDENTIFIER ::= { emcore-optiva-Kband-TX 1 }
+
+-----------------------------------------------------------------------
+-- BEGIN definitions which are 1 to 1 relationship with unit
+-----------------------------------------------------------------------
+moduleType                OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Type of K-band module."
+    ::= { optivaKbandTxObjects 1 }
+
+modelNumber               OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Assigned model number of module."
+    ::= { optivaKbandTxObjects 2 }
+
+serialNumber              OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Assigned serial number of module."
+    ::= { optivaKbandTxObjects 3 }
+
+firmwareVersion           OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Current installed firmware version."
+    ::= { optivaKbandTxObjects 4 }
+
+hardwareVersion           OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Current installed hardware version."
+    ::= { optivaKbandTxObjects 5 }
+
+mfgDate                   OBJECT-TYPE
+    SYNTAX                DisplayString (SIZE(0..16))
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Manufacturing date."
+    ::= { optivaKbandTxObjects 6 }
+
+summaryAlarmStatus        OBJECT-TYPE
+    SYNTAX                BITS 
+                          {
+                           systemTemp(0),
+                           laserTemp(1),
+                           edfaTemp(2),
+                           laserCurrent(3),
+                           edfaCurrent(4),
+                           photoInLow(5),
+                           photoInHigh(6),
+                           keyInOffPosition(7),
+                           rxOpticalOverload(8),
+                           plus12V(10),
+                           coolingFan(11),
+                           modulatorUnlocked(12),
+                           modulatorReset(13),
+                           linkStatusFailed(14)
+                          }
+    UNITS                 "no units"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Returns a bit mapped status word where each bit set (as defined below) 
+                           indicates a specific active alarm:
+
+                               0       1       2       3       4       5       6       7    
+                           +-------+-------+-------+-------+-------+-------+-------+-------+
+                           |System | Laser | EDFA  | Laser | EDFA  | Photo | Photo |Key in |
+                           | Temp  | Temp  | Temp  |Current|Current| Input | Input | OFF   |
+                           |       |       |       |       |       | Low   | High  |Position
+                           |       |       |       |       |       |       |       |       |
+                           +-------+-------+-------+-------+-------+-------+-------+-------+
+
+                               8       9       10      11      12      13      14      15   
+                           +-------+-------+-------+-------+-------+-------+-------+-------+
+                           | RX    |       | Plus  |Cooling|Modu-  |Modu-  | Link  |       |
+                           |Optical|       | 12V   | Fan   |  lator|  lator| Status|       |
+                           |Over-  |       | Supply|Current|Unlock |Reset  | Failed|       |
+                           |   load|       |       |       |       |       |       |       |
+                           +-------+-------+-------+-------+-------+-------+-------+-------+
+                          "
+    ::= { optivaKbandTxObjects 7 }
+   
+plus12VPowerSupplyStatus  OBJECT-TYPE
+    SYNTAX                Integer32(0..160)
+    UNITS                 "tenth of a volt(V)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured voltage of the +12V supply."
+    ::= { optivaKbandTxObjects 8 }
+
+unitInternalTemperature   OBJECT-TYPE
+    SYNTAX                Integer32(-500..1200)
+    UNITS                 "tenth of a Celsius degree(C)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured temperature of printed circuit board assembly."
+    ::= { optivaKbandTxObjects 9 }
+
+fanCurrent                OBJECT-TYPE
+    SYNTAX                Integer32(0..1250)
+    UNITS                 "milliampere(mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured DC current of cooling fan."
+    ::= { optivaKbandTxObjects 10}
+     
+keyswitchPosition         OBJECT-TYPE
+    SYNTAX                INTEGER { undefined(0),off(1),on(2) }
+    UNITS                 "no units"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Physical position of the front panel keyswitch." 
+    ::= { optivaKbandTxObjects 11}
+     
+txRFInputPower            OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of decibel relative to one milliwatt(dBm)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured RF power at TX input."
+    ::= { optivaKbandTxObjects 12}
+     
+sourceLaserPower          OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of decibel relative to one milliwatt(dBm)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured optical power output of 1550nm source laser."
+    ::= { optivaKbandTxObjects 13}
+     
+sourceLaserCurrent        OBJECT-TYPE
+    SYNTAX                Integer32(0..1250)
+    UNITS                 "milliampere(mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured DC current of 1550nm source laser."
+    ::= { optivaKbandTxObjects 14}
+     
+sourceLaserTemperature    OBJECT-TYPE
+    SYNTAX                Integer32(-500..1200)
+    UNITS                 "tenth of a Celsius degree(C)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured temperature of 1550nm source laser."
+    ::= { optivaKbandTxObjects 15}
+
+modulatorOutputPower      OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of decibel relative to one milliwatt(dBm)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured optical power at modulator output and EDFA input."
+    ::= { optivaKbandTxObjects 16}
+     
+modulatorBiasVoltage      OBJECT-TYPE
+    SYNTAX                Integer32(-150..150)
+    UNITS                 "tenth of a volt(V)."
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured bias voltage of modulator."
+    ::= { optivaKbandTxObjects 17}
+     
+modulatorBiasResetCommand OBJECT-TYPE
+    SYNTAX                INTEGER { normal(0),reset(1) }
+    UNITS                 "no units"
+    MAX-ACCESS            read-write
+    STATUS                current
+    DESCRIPTION           "This object is used to reset the modulator bias voltage to its initial value.
+                           Other values written to the object have no effect.
+                           Reading the object returns a 0 and has no effect on the module.
+                          " 
+    ::= { optivaKbandTxObjects 18}
+ 
+edfaPumpLaserPhotoCurrent OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of a milliampere(mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured back facet photodetector current of EDFA pump laser."
+    ::= { optivaKbandTxObjects 19}
+     
+edfaPumpLaserCurrent      OBJECT-TYPE
+    SYNTAX                Integer32(0..1250)
+    UNITS                 "milliampere(mA)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured DC current of EDFA pump laser."
+    ::= { optivaKbandTxObjects 20}
+     
+edfaPumpLaserTemperature  OBJECT-TYPE
+    SYNTAX                Integer32(-500..1200)
+    UNITS                 "tenth of a Celsius degree(C)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured temperature of EDFA pump laser."
+    ::= { optivaKbandTxObjects 21}
+
+txOpticalOutputPower      OBJECT-TYPE
+    SYNTAX                Integer32(-1000..200)
+    UNITS                 "tenth of decibel relative to one milliwatt(dBm)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Measured optical power at TX output."
+    ::= { optivaKbandTxObjects 22}
+
+rfAmplifierAttenSetpoint  OBJECT-TYPE
+    SYNTAX                Integer32(0..300)
+    UNITS                 "tenth of decibel (dB)"
+    MAX-ACCESS            read-write
+    STATUS                current
+    DESCRIPTION           "Internal RF amplifier attenuator setpoint."
+    ::= { optivaKbandTxObjects 23}
+
+rfAmplifierGainSetting    OBJECT-TYPE
+    SYNTAX                Integer32(0..500)
+    UNITS                 "tenth of decibel (dB)"
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION           "Internal RF amplifier gain setting."
+    ::= { optivaKbandTxObjects 24}
+
+-----------------------------------------------------------------------
+-- END definitions which are 1 to 1 relationship with unit
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------
+-- BEGIN K-band TX common objects
+-----------------------------------------------------------------------
+optivaKbandTxCommonObjectGroup  OBJECT-GROUP
+    OBJECTS       { moduleType,
+                    serialNumber,
+                    modelNumber,
+                    firmwareVersion,
+                    hardwareVersion,
+                    mfgDate,
+	                summaryAlarmStatus,
+	                plus12VPowerSupplyStatus,
+	                unitInternalTemperature,
+	                fanCurrent,
+	                keyswitchPosition,
+	                txRFInputPower,
+	                sourceLaserPower,
+	                sourceLaserCurrent,
+	                sourceLaserTemperature,
+	                modulatorOutputPower,
+	                modulatorBiasVoltage,
+	                modulatorBiasResetCommand,
+	                edfaPumpLaserPower,
+	                edfaPumpLaserCurrent,
+	                edfaPumpLaserTemperature,
+	                txOpticalOutputPower,
+	                rfAmplifierAttenSetpoint,
+	                rfAmplifierGainSetting
+                  }
+    STATUS        current
+    DESCRIPTION  "K-band TX common object group"
+    ::= { optivaKbandTxObjects 25}
+
+-----------------------------------------------------------------------
+-- END K-band TX common events
+-----------------------------------------------------------------------
+
+END
+--  End of K-band TX MIB definitions      
+
+
+
+
+
+
+
+
+
+
+
